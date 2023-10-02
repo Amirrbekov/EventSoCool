@@ -8,10 +8,12 @@ import LoadingComponent from "../../../app/layout/LoadingComponent";
 import { Formik, Form } from "formik";
 import * as Yup from 'yup'
 import MyTextInput from "../../../app/common/form/MyTextInput";
-import MyTextArea from "./MyTextArea";
-import MySelectInput from "./MySelectInput";
+import MySelectInput from "../../../app/common/form/MySelectInput";
 import { categoryOptions } from "../../../app/common/options/categoryOptions";
-import MyDateInput from "./MyDateInput";
+import MyDateInput from "../../../app/common/form/MyDateInput";
+import MyTextArea from "../../../app/common/form/MyTextArea";
+import {v4 as uuid} from 'uuid'
+import { router } from "../../../app/router/Routes";
 
 export default observer(function ActivityForm() {
 
@@ -46,9 +48,9 @@ export default observer(function ActivityForm() {
     function handleFormSubmit(activity: Activity) {
         if (activity.id) {
             activity.id = uuid();
-            createActivity(activity).then(() => navigate(`/activities/${activity.id}`))
+            createActivity(activity).then(() => router.navigate(`/activities/${activity.id}`))
         } else {
-            updateActivity(activity).then(() => navigate(`/activities/${activity.id}`))
+            updateActivity(activity).then(() => router.navigate(`/activities/${activity.id}`))
         }
     }
 

@@ -24,7 +24,7 @@ public class TokenService
             new Claim(ClaimTypes.Email, user.Email),
         };
         // AlcUluZfq5d0KymIecV0SBoCufQ7fKg01yVNWcTObDSbHwRcLc7hTNhhkYaaGpLY
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"]??= ""));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
         var tokenDescriptor = new SecurityTokenDescriptor

@@ -1,8 +1,9 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Activities;
@@ -25,12 +26,26 @@ public class Create
     public class Handler : IRequestHandler<Command, Result<Unit>>
     {
         private readonly DataContext _db;
-        public Handler(DataContext db)
+        private readonly IUserAccessor _userAccessor;
+
+        public Handler(DataContext db, IUserAccessor userAccessor)
         {
             _db = db;
+            _userAccessor = userAccessor;
         }
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
+
+            var attendee = new ActivityAttendee
+            {
+                AppUser = user,
+                Activity = request.Activity,
+                IsHost = true
+            };
+
+            request.Activity.Attendees.Add(attendee);
+
             _db.Activities.Add(request.Activity);
 
             var result = await _db.SaveChangesAsync() > 0;

@@ -29,11 +29,8 @@ public class Add
         }
         public async Task<Result<Photo>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _db.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
-
-            if (user == null) return null;
-
             var photoUploadResult = await _photoAccessor.AddPhoto(request.File);
+            var user = await _db.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
 
             var photo = new Photo
             {

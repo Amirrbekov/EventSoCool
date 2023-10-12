@@ -1,4 +1,5 @@
-﻿using Application.Profiles;
+﻿using Application.Comments;
+using Application.Profiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,4 +24,5 @@ public class ActivityDto
 
 
     public ICollection<AttendeeDto> Attendees { get; set; }
+    public ICollection<CommentDto> Comments { get; set; }
 }

@@ -28,14 +28,14 @@ function App() {
     <>
       <ModalContainer/>
       <ToastContainer position='bottom-right' hideProgressBar theme='colored'/>
-      {location.pathname === '/' ? <HomePage/> : [
+      {location.pathname === '/' ? <HomePage/> : (
         <>
           <NavBar />
           <Container style={{marginTop: '7rem'}}>
             <Outlet/>
           </Container>
         </>
-      ]}
+      )}
 
     </>
   )

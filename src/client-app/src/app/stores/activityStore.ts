@@ -7,13 +7,13 @@ import { Profile } from "../models/profile";
 
 export default class ActivityStore {
     activityRegistry = new Map<string, Activity>();
-    selectedActivity: Activity | undefined = undefined;
+    selectedActivity?: Activity = undefined;
     editMode = false;
     loading = false;
     loadingInitial = false;
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this);
     }
 
     get grouppedActivities() {
@@ -32,7 +32,6 @@ export default class ActivityStore {
     }
 
     loadActivities = async () => {
-        this.setLoadingInitial(true);
         this.setLoadingInitial(true);
         try {
             const activities = await agent.Activities.list();
@@ -58,7 +57,6 @@ export default class ActivityStore {
                 activity = await agent.Activities.details(id);
                 this.setActivity(activity);
                 runInAction(() => this.selectedActivity = activity);
-                this.selectedActivity = activity;
                 this.setLoadingInitial(false);
                 return activity;
             } catch (error) {
@@ -171,5 +169,9 @@ export default class ActivityStore {
         } finally {
             runInAction(() => this.loading = false);
         }
+    }
+
+    clearSelectedActivity = () => {
+        this.selectedActivity = undefined;
     }
 }

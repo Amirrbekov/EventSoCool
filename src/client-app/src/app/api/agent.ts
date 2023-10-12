@@ -14,6 +14,14 @@ const sleep = (delay: number) => {
 
 axios.defaults.baseURL = 'http://localhost:5000/api';
 
+const responseBody = <T>(response: AxiosResponse<T>) => response.data;
+
+axios.interceptors.request.use(config => {
+    const token = store.commonStore.token;
+    if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+})
+
 axios.interceptors.response.use(async response => {
     await sleep(1000);
     return response;
@@ -22,45 +30,36 @@ axios.interceptors.response.use(async response => {
     switch (status) {
         case 400:
             // eslint-disable-next-line no-prototype-builtins
-            if (config.method === 'get' && Object.prototype.hasOwnProperty.call(data.errors, 'id')) {
+            if (config.method === 'get' && data.errors.hasOwnProperty('id')) {
                 router.navigate('/not-found');
             }
             if (data.errors) {
-                const modelStateErrors = [];
+                const modalStateErrors = [];
                 for (const key in data.errors) {
                     if (data.errors[key]) {
-                        modelStateErrors.push(data.errors[key])
+                        modalStateErrors.push(data.errors[key])
                     }
                 }
-                throw modelStateErrors.flat();
+                throw modalStateErrors.flat();
             } else {
                 toast.error(data);
             }
             break;
-        case 401:
+        case 401: 
             toast.error('unauthorised')
-            break
+            break;
         case 403:
             toast.error('forbidden')
             break;
         case 404:
-           router.navigate('/not-found');
-           break;
+            router.navigate('/not-found');
+            break;
         case 500:
             store.commonStore.setServerError(data);
             router.navigate('/server-error');
             break;
     }
-
     return Promise.reject(error);
-})
-
-const responseBody = <T> (response: AxiosResponse<T>) => response.data;
-
-axios.interceptors.request.use(config => {
-    const token = store.commonStore.token;
-    if (token && config.headers) config.headers.Authorization = `Bearer ${token}`
-    return config;
 })
 
 const request = {
@@ -73,10 +72,10 @@ const request = {
 const Activities = {
     list: () => request.get<Activity[]>('/activities'),
     details: (id: string) => request.get<Activity>(`/activities/${id}`),
-    create: (activity: ActivityFormValues) => request.post(`/activities`, activity),
-    update: (activity: ActivityFormValues) => request.put(`/activities/${activity.id}`, activity),
-    delete: (id: string) => request.delete(`/activities/${id}`),
-    attend: (id: string) => request.post(`/activities/${id}/attend`, {})
+    create: (activity: ActivityFormValues) => request.post<void>(`/activities`, activity),
+    update: (activity: ActivityFormValues) => request.put<void>(`/activities/${activity.id}`, activity),
+    delete: (id: string) => request.delete<void>(`/activities/${id}`),
+    attend: (id: string) => request.post<void>(`/activities/${id}/attend`, {})
 }
 
 const Account = {

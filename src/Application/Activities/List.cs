@@ -12,7 +12,7 @@ public class List
 {
     public class Query : IRequest<Result<PageList<ActivityDto>>>
     {
-        public PagingParams Params { get; set; }
+        public ActivityParams Params { get; set; }
     }
 
     public class Handler : IRequestHandler<Query, Result<PageList<ActivityDto>>>
@@ -29,12 +29,24 @@ public class List
         }
         public async Task<Result<PageList<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var query = _db.Activities.OrderBy(d => d.Date)
+            var query = _db.Activities
+                .Where(d => d.Date >= request.Params.StartDate)
+                .OrderBy(d => d.Date)
                 .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider, new { currenUsername = _userAccessor.GetUsername() }).AsQueryable();
+
+            if (request.Params.IsGoind && !request.Params.IsHost)
+            {
+                query = query.Where(x => x.Attendees.Any(a => a.Username == _userAccessor.GetUsername()));
+            }
+            if (request.Params.IsHost && !request.Params.IsGoind)
+            {
+                query = query.Where(x => x.HostUsername == _userAccessor.GetUsername());
+            }
 
             return Result<PageList<ActivityDto>>.Success(
                 await PageList<ActivityDto>.CreateAsync(query, request.Params.PageNumber, request.Params.PageSize)    
             );
+      
         }
     }
 }

@@ -1,12 +1,10 @@
 ﻿using MediatR;
-using Domain;
 using Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Application.Core;
-using Microsoft.AspNetCore.Http.HttpResults;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Application.Interfaces;
 
 namespace Application.Activities;
 
@@ -21,15 +19,17 @@ public class List
     {
         private readonly DataContext _db;
         private readonly IMapper _mapper;
+        private readonly IUserAccessor _userAccessor;
 
-        public Handler(DataContext db, IMapper mapper)
+        public Handler(DataContext db, IMapper mapper, IUserAccessor userAccessor)
         {
             _db = db;
             _mapper = mapper;
+            _userAccessor = userAccessor;
         }
         public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var activities = await _db.Activities.ProjectTo<ActivityDto>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken);
+            var activities = await _db.Activities.ProjectTo<ActivityDto>(_mapper.ConfigurationProvider, new { currenUsername = _userAccessor.GetUsername() }).ToListAsync(cancellationToken);
 
             return Result<List<ActivityDto>>.Success(activities);
         }

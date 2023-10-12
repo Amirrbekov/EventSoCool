@@ -1,4 +1,5 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -23,14 +24,16 @@ public class Details
     {
         private readonly DataContext _db;
         private readonly IMapper _mapper;
-        public Hadnler(DataContext db, IMapper mapper)
+        private readonly IUserAccessor _userAccessor;
+        public Hadnler(DataContext db, IMapper mapper, IUserAccessor userAccessor)
         {
             _db = db;
             _mapper = mapper;
+            _userAccessor = userAccessor;
         }
         public async Task<Result<Profile>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var user = await _db.Users.ProjectTo<Profile>(_mapper.ConfigurationProvider).SingleOrDefaultAsync(x => x.Username == request.Username);
+            var user = await _db.Users.ProjectTo<Profile>(_mapper.ConfigurationProvider, new { currenUsername = _userAccessor.GetUsername() }).SingleOrDefaultAsync(x => x.Username == request.Username);
 
             return Result<Profile>.Success(user);
         }

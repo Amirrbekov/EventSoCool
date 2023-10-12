@@ -1,4 +1,5 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain;
@@ -24,15 +25,17 @@ public class Details
     {
         private readonly DataContext _db;
         private readonly IMapper _mapper;
+        private readonly IUserAccessor _userAccessor;
 
-        public Handler(DataContext db, IMapper mapper)
+        public Handler(DataContext db, IMapper mapper, IUserAccessor userAccessor)
         {
             _db = db;
             _mapper = mapper;
+            _userAccessor = userAccessor;
         }
         public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var activity = await _db.Activities.ProjectTo<ActivityDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(x => x.Id == request.Id);
+            var activity = await _db.Activities.ProjectTo<ActivityDto>(_mapper.ConfigurationProvider, new { currenUsername = _userAccessor.GetUsername() }).FirstOrDefaultAsync(x => x.Id == request.Id);
 
             return Result<ActivityDto>.Success(activity);
         }

@@ -1,34 +1,35 @@
 import { User } from "./user";
 
-export interface IProfile {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface Profile {
     username: string;
     displayName: string;
     image?: string;
     bio?: string;
-    photos?: Photo[];
     followersCount: number;
     followingCount: number;
     following: boolean;
+    photos?: Photo[]
 }
 
-export class Profile implements IProfile {
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export class Profile implements Profile {
     constructor(user: User) {
         this.username = user.username;
         this.displayName = user.displayName;
-        this.image = user.image;
+        this.image = user.image
     }
-    username: string;
-    displayName: string;
-    image?: string | undefined;
-    bio?: string | undefined;
-    photos?: Photo[];
-    followersCount = 0;
-    followingCount = 0;
-    following = false;
 }
 
 export interface Photo {
     id: string;
     url: string;
     isMain: boolean;
+}
+
+export interface UserActivity {
+    id: string;
+    title: string;
+    category: string;
+    date: Date;
 }

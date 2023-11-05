@@ -6,6 +6,8 @@ using FluentValidation.AspNetCore;
 using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Persistence;
 
 namespace API.Extensions;
@@ -19,7 +21,8 @@ public static class ApplicationServiceExtensions
         services.AddSwaggerGen();
         services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+            opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
+            opt.EnableSensitiveDataLogging();
         });
 
         services.AddCors(opt =>
